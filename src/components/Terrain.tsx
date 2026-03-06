@@ -4,19 +4,29 @@ import * as THREE from 'three'
 
 export function Terrain() {
   const geometry = useMemo(() => {
-    const geo = new THREE.PlaneGeometry(200, 200, 64, 64)
+    const geo = new THREE.PlaneGeometry(300, 300, 100, 100)
     const positions = geo.attributes.position.array as Float32Array
     
-    // Create rolling hills
+    // Create more dramatic rolling hills
     for (let i = 0; i < positions.length; i += 3) {
       const x = positions[i]
       const y = positions[i + 1]
-      // Perlin-ish noise approximation
-      const height = 
-        Math.sin(x * 0.05) * 2 +
-        Math.cos(y * 0.03) * 3 +
-        Math.sin((x + y) * 0.02) * 1.5
-      positions[i + 2] = Math.max(0, height) // Z becomes height when rotated
+      
+      // Multi-layered noise for natural-looking hills
+      const bigHills = Math.sin(x * 0.02) * Math.cos(y * 0.015) * 8
+      const mediumHills = Math.sin(x * 0.05 + 1) * Math.cos(y * 0.04) * 4
+      const smallBumps = Math.sin(x * 0.1) * Math.sin(y * 0.12) * 1.5
+      const variation = Math.sin((x + y) * 0.03) * 2
+      
+      // Combine all frequencies
+      let height = bigHills + mediumHills + smallBumps + variation
+      
+      // Keep a flat path down the center for the road
+      const centerFlatness = Math.exp(-(x * x) / 800)
+      height *= (1 - centerFlatness * 0.8)
+      
+      // Ensure minimum height of 0
+      positions[i + 2] = Math.max(0, height)
     }
     
     geo.computeVertexNormals()

@@ -5,6 +5,8 @@ interface GameState {
   inVehicle: boolean
   hasGunther: boolean
   guntherSecured: boolean
+  holdingHands: boolean
+  strain: number
   guntherPosition: Vector3
   playerPosition: Vector3
   vehiclePosition: Vector3
@@ -18,6 +20,8 @@ interface GameContextType extends GameState {
   setInVehicle: (v: boolean) => void
   setHasGunther: (v: boolean) => void
   setGuntherSecured: (v: boolean) => void
+  setHoldingHands: (v: boolean) => void
+  setStrain: (v: number) => void
   setGuntherPosition: (pos: Vector3) => void
   setPlayerPosition: (pos: Vector3) => void
   setVehiclePosition: (pos: Vector3) => void
@@ -32,6 +36,8 @@ const initialState: GameState = {
   inVehicle: true,
   hasGunther: true,
   guntherSecured: true,
+  holdingHands: false,
+  strain: 0,
   guntherPosition: new Vector3(0, 1, 0),
   playerPosition: new Vector3(0, 1, 0),
   vehiclePosition: new Vector3(0, 1, 0),
@@ -57,6 +63,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const setInVehicle = useCallback((v: boolean) => setState(s => ({ ...s, inVehicle: v })), [])
   const setHasGunther = useCallback((v: boolean) => setState(s => ({ ...s, hasGunther: v })), [])
   const setGuntherSecured = useCallback((v: boolean) => setState(s => ({ ...s, guntherSecured: v })), [])
+  const setHoldingHands = useCallback((v: boolean) => setState(s => ({ ...s, holdingHands: v })), [])
+  const setStrain = useCallback((v: number) => setState(s => ({ ...s, strain: v })), [])
   const setGuntherPosition = useCallback((pos: Vector3) => setState(s => ({ ...s, guntherPosition: pos.clone() })), [])
   const setPlayerPosition = useCallback((pos: Vector3) => setState(s => ({ ...s, playerPosition: pos.clone() })), [])
   const setVehiclePosition = useCallback((pos: Vector3) => setState(s => ({ ...s, vehiclePosition: pos.clone() })), [])
@@ -102,6 +110,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       setInVehicle,
       setHasGunther,
       setGuntherSecured,
+      setHoldingHands,
+      setStrain,
       setGuntherPosition,
       setPlayerPosition,
       setVehiclePosition,

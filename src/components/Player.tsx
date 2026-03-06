@@ -57,11 +57,13 @@ export function Player() {
     inVehicle, setInVehicle, 
     vehiclePosition, setPlayerPosition,
     guntherPosition, guntherSecured, setGuntherSecured, setHasGunther,
+    holdingHands, setHoldingHands, setStrain,
     damageEnemy, enemies
   } = useGame()
   
   const lastInteract = useRef(0)
   const lastShoot = useRef(0)
+  const lastGrab = useRef(0)
   const wasInVehicle = useRef(true)
 
   useFrame((state) => {
@@ -130,16 +132,30 @@ export function Player() {
       lastInteract.current = now
       const dist = new Vector3(pos.x, pos.y, pos.z).distanceTo(vehiclePosition)
       if (dist < 6) {
+        // If holding hands, bring Gunther into the car
+        if (holdingHands) {
+          setGuntherSecured(true)
+          setHasGunther(true)
+          setHoldingHands(false)
+          setStrain(0)
+        }
         setInVehicle(true)
       }
     }
     
-    // Grab Gunther
-    if (keys.grab && !guntherSecured) {
+    // SPACE: Hold/release Gunther's hand
+    if (keys.grab && now - lastGrab.current > 0.3) {
+      lastGrab.current = now
       const gDist = new Vector3(pos.x, pos.y, pos.z).distanceTo(guntherPosition)
-      if (gDist < 4) {
-        setGuntherSecured(true)
-        setHasGunther(true)
+      
+      if (holdingHands) {
+        // Release hand
+        setHoldingHands(false)
+        setStrain(0)
+      } else if (!guntherSecured && gDist < 4) {
+        // Grab hand
+        setHoldingHands(true)
+        setStrain(0)
       }
     }
     

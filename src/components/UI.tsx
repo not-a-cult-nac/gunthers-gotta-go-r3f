@@ -11,6 +11,7 @@ if (typeof window !== 'undefined') {
 export function UI() {
   const { 
     inVehicle, hasGunther, guntherSecured, 
+    holdingHands, strain,
     gameStatus, message, resetGame,
     autoplay, setAutoplay
   } = useGame()
@@ -67,10 +68,48 @@ export function UI() {
         <div>
           👶 Gunther: {
             guntherSecured ? '✅ Secured' : 
-            hasGunther ? '⚠️ Loose!' : '❌ Lost!'
+            holdingHands ? (strain > 60 ? '🖐️ HOLDING (STRUGGLING!)' : '🖐️ Holding Hands') :
+            hasGunther ? '⚠️ Wandering!' : '❌ Lost!'
           }
         </div>
       </div>
+
+      {/* Strain meter when holding hands */}
+      {holdingHands && (
+        <div style={{
+          position: 'absolute',
+          bottom: 80,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 300,
+          background: 'rgba(0,0,0,0.7)',
+          borderRadius: 15,
+          padding: 5,
+        }}>
+          <div style={{
+            color: 'white',
+            fontSize: 12,
+            textAlign: 'center',
+            marginBottom: 5,
+          }}>
+            🖐️ GUNTHER'S PULL STRENGTH
+          </div>
+          <div style={{
+            height: 20,
+            background: 'rgba(255,255,255,0.2)',
+            borderRadius: 10,
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              height: '100%',
+              width: `${strain}%`,
+              background: strain > 70 ? '#e74c3c' : strain > 40 ? '#f39c12' : '#27ae60',
+              transition: 'width 0.1s, background 0.3s',
+              borderRadius: 10,
+            }} />
+          </div>
+        </div>
+      )}
 
       {/* Controls */}
       <div style={{
@@ -94,8 +133,8 @@ export function UI() {
           <>
             <div>WASD - Move</div>
             <div>Click - Shoot</div>
-            <div>Space - Grab Gunther</div>
-            <div>E - Enter vehicle (when close)</div>
+            <div>Space - Hold/Release Hand</div>
+            <div>E - Enter vehicle (brings Gunther if holding)</div>
           </>
         )}
       </div>
