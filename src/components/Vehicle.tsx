@@ -5,7 +5,7 @@ import { Vector3, Quaternion, Euler } from 'three'
 import { useGame } from '../state/GameContext'
 
 // Direct keyboard state (more reliable than KeyboardControls)
-const keys = {
+const humanKeys = {
   forward: false,
   backward: false,
   left: false,
@@ -15,19 +15,31 @@ const keys = {
 
 if (typeof window !== 'undefined') {
   window.addEventListener('keydown', (e) => {
-    if (e.code === 'KeyW' || e.code === 'ArrowUp') keys.forward = true
-    if (e.code === 'KeyS' || e.code === 'ArrowDown') keys.backward = true
-    if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.left = true
-    if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.right = true
-    if (e.code === 'KeyE') keys.interact = true
+    if (e.code === 'KeyW' || e.code === 'ArrowUp') humanKeys.forward = true
+    if (e.code === 'KeyS' || e.code === 'ArrowDown') humanKeys.backward = true
+    if (e.code === 'KeyA' || e.code === 'ArrowLeft') humanKeys.left = true
+    if (e.code === 'KeyD' || e.code === 'ArrowRight') humanKeys.right = true
+    if (e.code === 'KeyE') humanKeys.interact = true
   })
   window.addEventListener('keyup', (e) => {
-    if (e.code === 'KeyW' || e.code === 'ArrowUp') keys.forward = false
-    if (e.code === 'KeyS' || e.code === 'ArrowDown') keys.backward = false
-    if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.left = false
-    if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.right = false
-    if (e.code === 'KeyE') keys.interact = false
+    if (e.code === 'KeyW' || e.code === 'ArrowUp') humanKeys.forward = false
+    if (e.code === 'KeyS' || e.code === 'ArrowDown') humanKeys.backward = false
+    if (e.code === 'KeyA' || e.code === 'ArrowLeft') humanKeys.left = false
+    if (e.code === 'KeyD' || e.code === 'ArrowRight') humanKeys.right = false
+    if (e.code === 'KeyE') humanKeys.interact = false
   })
+}
+
+// Merge human and AI inputs
+function getKeys() {
+  const ai = (typeof window !== 'undefined' && (window as any).aiKeys) || {}
+  return {
+    forward: humanKeys.forward || ai.forward,
+    backward: humanKeys.backward || ai.backward,
+    left: humanKeys.left || ai.left,
+    right: humanKeys.right || ai.right,
+    interact: humanKeys.interact || ai.interact,
+  }
 }
 
 export function Vehicle() {
@@ -44,6 +56,7 @@ export function Vehicle() {
     setVehiclePosition(new Vector3(pos.x, pos.y, pos.z))
     
     const now = state.clock.elapsedTime
+    const keys = getKeys()
     
     // Handle exit/enter
     if (keys.interact && now - lastInteract.current > 0.5) {

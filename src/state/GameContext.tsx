@@ -11,6 +11,7 @@ interface GameState {
   enemies: { id: string; position: Vector3; health: number; hasGunther: boolean }[]
   gameStatus: 'playing' | 'won' | 'lost'
   message: string
+  autoplay: boolean
 }
 
 interface GameContextType extends GameState {
@@ -24,6 +25,7 @@ interface GameContextType extends GameState {
   setEnemyHasGunther: (id: string, has: boolean) => void
   setGameStatus: (status: 'playing' | 'won' | 'lost', message?: string) => void
   resetGame: () => void
+  setAutoplay: (v: boolean) => void
 }
 
 const initialState: GameState = {
@@ -40,6 +42,7 @@ const initialState: GameState = {
   ],
   gameStatus: 'playing',
   message: '',
+  autoplay: false,
 }
 
 const GameContext = createContext<GameContextType | null>(null)
@@ -81,14 +84,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const resetGame = useCallback(() => {
-    setState({
+    setState(s => ({
       ...initialState,
       guntherPosition: new Vector3(0, 1, 0),
       playerPosition: new Vector3(0, 1, 0),
       vehiclePosition: new Vector3(0, 1, 0),
       enemies: initialState.enemies.map(e => ({ ...e, position: e.position.clone() })),
-    })
+      autoplay: s.autoplay, // preserve autoplay setting on reset
+    }))
   }, [])
+
+  const setAutoplay = useCallback((v: boolean) => setState(s => ({ ...s, autoplay: v })), [])
 
   return (
     <GameContext.Provider value={{
@@ -103,6 +109,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       setEnemyHasGunther,
       setGameStatus,
       resetGame,
+      setAutoplay,
     }}>
       {children}
     </GameContext.Provider>

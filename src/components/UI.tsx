@@ -11,7 +11,8 @@ if (typeof window !== 'undefined') {
 export function UI() {
   const { 
     inVehicle, hasGunther, guntherSecured, 
-    gameStatus, message, resetGame 
+    gameStatus, message, resetGame,
+    autoplay, setAutoplay
   } = useGame()
   
   const [debug, setDebug] = useState('')
@@ -115,6 +116,31 @@ export function UI() {
         <div style={{ marginTop: 8, fontSize: 12, color: '#aaa' }}>
           Warning: Gunther runs toward danger and enemies want to steal him!
         </div>
+      </div>
+
+      {/* Autoplay Toggle */}
+      <div style={{
+        position: 'absolute',
+        top: 140,
+        right: 20,
+        pointerEvents: 'auto',
+      }}>
+        <button
+          onClick={() => setAutoplay(!autoplay)}
+          style={{
+            padding: '12px 20px',
+            fontSize: 14,
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            background: autoplay ? '#e74c3c' : '#27ae60',
+            color: 'white',
+            border: 'none',
+            borderRadius: 8,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+          }}
+        >
+          {autoplay ? '🤖 AUTOPLAY ON' : '🎮 AUTOPLAY OFF'}
+        </button>
       </div>
 
       {/* Game over overlay */}

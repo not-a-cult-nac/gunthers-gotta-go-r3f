@@ -5,6 +5,7 @@ import { Gunther } from './Gunther'
 import { Enemy } from './Enemy'
 import { Goal } from './Goal'
 import { Hazards } from './Hazards'
+import { AIController } from './AIController'
 import { useGame } from '../state/GameContext'
 
 export function Game() {
@@ -18,6 +19,7 @@ export function Game() {
       <Gunther />
       <Goal position={[0, 1, 100]} />
       <Hazards />
+      <AIController />
       {enemies.map(enemy => (
         <Enemy key={enemy.id} id={enemy.id} initialPosition={enemy.position} />
       ))}
